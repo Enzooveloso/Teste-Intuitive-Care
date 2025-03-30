@@ -1,13 +1,14 @@
-import os
-import requests
 from bs4 import BeautifulSoup
-from zipfile import ZipFile
+import requests
+import os
+
+from utils.arquivos import baixar_pdf, compactar_em_zip
+from config import PDF_DIR, ZIP_PDFS
 
 URL_SITE = "https://www.gov.br/ans/pt-br/acesso-a-informacao/participacao-da-sociedade/atualizacao-do-rol-de-procedimentos"
-DESTINO_PASTA = "data/pdfs"
-NOME_ZIP = "output/Anexos_ANS.zip"
 
 def buscar_links_dos_pdfs(url):
+    print("Buscando links dos PDFs na página da ANS...")
     resposta = requests.get(url)
     soup = BeautifulSoup(resposta.content, "html.parser")
     links_pdf = []
@@ -19,33 +20,16 @@ def buscar_links_dos_pdfs(url):
                 if not href.startswith("http"):
                     href = "https://www.gov.br" + href
                 links_pdf.append(href)
-    
+
+    print(f"Encontrados {len(links_pdf)} links de PDF.")
     return links_pdf
 
-def baixar_pdf(link, destino):
-    nome_arquivo = os.path.basename(link)
-    caminho = os.path.join(destino, nome_arquivo)
-    print(f"Baixando {nome_arquivo}...")
-    resposta = requests.get(link)
-    with open(caminho, "wb") as f:
-        f.write(resposta.content)
-    return caminho
-
-def compactar_em_zip(lista_de_arquivos, nome_arquivo_zip):
-    print("Compactando arquivos...")
-    with ZipFile(nome_arquivo_zip, 'w') as zipf:
-        for arquivo in lista_de_arquivos:
-            zipf.write(arquivo, arcname=os.path.basename(arquivo))
-    print("Compactação finalizada com sucesso!")
-
 def main():
-    os.makedirs(DESTINO_PASTA, exist_ok=True)
-    os.makedirs(os.path.dirname(NOME_ZIP), exist_ok=True)
-
+    os.makedirs(PDF_DIR, exist_ok=True)
 
     links = buscar_links_dos_pdfs(URL_SITE)
-    arquivos_baixados = [baixar_pdf(link, DESTINO_PASTA) for link in links]
-    compactar_em_zip(arquivos_baixados, NOME_ZIP)
+    arquivos_baixados = [baixar_pdf(link, PDF_DIR) for link in links]
+    compactar_em_zip(arquivos_baixados, ZIP_PDFS)
 
 if __name__ == "__main__":
     main()

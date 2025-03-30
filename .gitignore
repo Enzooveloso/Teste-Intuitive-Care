@@ -1,0 +1,8 @@
+# Arquivo de configuração para ignorar arquivos e diretórios no Git
+venv/
+__pycache__/
+*.pyc
+*.zip
+*.pdf
+*.csv
+.vscode/
