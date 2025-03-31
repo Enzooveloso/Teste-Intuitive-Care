@@ -1,4 +1,3 @@
-# Description: Configurações do projeto
 DATA_DIR = "data"
 PDF_DIR = f"{DATA_DIR}/pdfs"
 CSV_CAMINHO = f"{DATA_DIR}/rol_procedimentos.csv"

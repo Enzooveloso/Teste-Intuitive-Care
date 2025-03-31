@@ -28,7 +28,6 @@ def extrair_tabela_pdf(caminho_pdf):
         raise ValueError("Nenhuma tabela foi encontrada no PDF.")
 
     df_final = pd.concat(tabelas, ignore_index=True)
-    print(f"{len(df_final)} linhas extraídas.")
     return df_final
 
 def substituir_abreviacoes(df):

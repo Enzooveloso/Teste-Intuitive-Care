@@ -26,7 +26,6 @@ def buscar_links_dos_pdfs(url):
 
 def main():
     os.makedirs(PDF_DIR, exist_ok=True)
-
     links = buscar_links_dos_pdfs(URL_SITE)
     arquivos_baixados = [baixar_pdf(link, PDF_DIR) for link in links]
     compactar_em_zip(arquivos_baixados, ZIP_PDFS)

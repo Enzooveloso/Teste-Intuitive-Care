@@ -17,3 +17,5 @@ dist/
 frontend/node_modules/
 frontend/dist/
 *.log
+data/contabeis/*.csv
+data/operadoras/*.csv
