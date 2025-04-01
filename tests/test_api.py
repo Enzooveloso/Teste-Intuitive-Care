@@ -32,8 +32,8 @@ def test_post_operadora():
         "cnpj": "12345678900000",
         "razao_social": "Operadora de Teste",
         "modalidade": "Odontologia de Grupo",
-        "uf": "SP",
-        "municipio": "São Paulo",
+        "uf": "MG",
+        "municipio": "Montes Claros",
         "data_registro": "2025-01-01"
     }
     response = client.post("/operadora", json=nova_operadora)
