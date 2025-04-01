@@ -1,35 +1,54 @@
-from fastapi import FastAPI, Query
-from fastapi.middleware.cors import CORSMiddleware
-from typing import List
-import csv
-import os
+from fastapi import FastAPI, HTTPException, Depends
+from sqlalchemy.orm import Session
+from src.db import models
+from src.db.database import SessionLocal, engine
+
+models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-CSV_PATH = os.path.join("data", "operadoras", "Relatorio_cadop.csv")
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
 @app.get("/operadoras")
-def buscar_operadoras(q: str = Query(..., min_length=1)) -> List[dict]:
-    resultados = []
-    with open(CSV_PATH, encoding="utf-8-sig") as f:
-        reader = csv.DictReader(f, delimiter=';')
-        for row in reader:
-            if q.lower() in row['Razao_Social'].lower():
-                resultados.append({
-                    "registro_ans": row['Registro_ANS'],
-                    "razao_social": row['Razao_Social'],
-                    "cnpj": row['CNPJ'],
-                    "modalidade": row['Modalidade'],
-                    "uf": row['UF'],
-                    "municipio": row['Cidade'],
-                    "data_registro": row['Data_Registro_ANS'],      
-                })
-    return resultados
+def listar_operadoras(db: Session = Depends(get_db)):
+    return db.query(models.Operadora).all()
+
+@app.get("/operadoras/{registro_ans}")
+def buscar_operadora(registro_ans: int, db: Session = Depends(get_db)):
+    operadora = db.query(models.Operadora).filter(models.Operadora.registro_ans == registro_ans).first()
+    if not operadora:
+        raise HTTPException(status_code=404, detail="Operadora não encontrada")
+    return operadora
+
+@app.post("/operadoras")
+def criar_operadora(operadora: dict, db: Session = Depends(get_db)):
+    nova_operadora = models.Operadora(**operadora)
+    db.add(nova_operadora)
+    db.commit()
+    db.refresh(nova_operadora)
+    return nova_operadora
+
+@app.put("/operadoras/{registro_ans}")
+def atualizar_operadora(registro_ans: int, dados: dict, db: Session = Depends(get_db)):
+    operadora = db.query(models.Operadora).filter(models.Operadora.registro_ans == registro_ans).first()
+    if not operadora:
+        raise HTTPException(status_code=404, detail="Operadora não encontrada")
+    for chave, valor in dados.items():
+        setattr(operadora, chave, valor)
+    db.commit()
+    db.refresh(operadora)
+    return operadora
+
+@app.delete("/operadoras/{registro_ans}")
+def deletar_operadora(registro_ans: int, db: Session = Depends(get_db)):
+    operadora = db.query(models.Operadora).filter(models.Operadora.registro_ans == registro_ans).first()
+    if not operadora:
+        raise HTTPException(status_code=404, detail="Operadora não encontrada")
+    db.delete(operadora)
+    db.commit()
+    return {"mensagem": "Operadora deletada com sucesso"}
