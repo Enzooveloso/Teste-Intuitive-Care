@@ -17,10 +17,9 @@ def get_by_registro_ans(db: Session, registro_ans: int) -> Operadora | None:
 def create(db: Session, dados: OperadoraSchema) -> Operadora:
     nova = Operadora(**dados.dict())
     db.add(nova)
-    db.commit()
+    db.flush()
     db.refresh(nova)
     return nova
-
 
 def update(db: Session, registro_ans: int, dados: OperadoraSchema) -> Operadora | None:
     operadora = get_by_registro_ans(db, registro_ans)
@@ -28,15 +27,13 @@ def update(db: Session, registro_ans: int, dados: OperadoraSchema) -> Operadora 
         return None
     for chave, valor in dados.dict(exclude_unset=True).items():
         setattr(operadora, chave, valor)
-    db.commit()
+    db.flush()
     db.refresh(operadora)
     return operadora
-
 
 def delete(db: Session, registro_ans: int) -> bool:
     operadora = get_by_registro_ans(db, registro_ans)
     if not operadora:
         return False
     db.delete(operadora)
-    db.commit()
     return True
