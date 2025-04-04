@@ -41,7 +41,7 @@ Este repositório contém a solução para o teste de nivelamento proposto pela 
 
 - Foi criada uma *coleção do Postman* com todas as requisições.
 - A coleção pode ser importada no Postman para simular as chamadas da API.
-- Arquivo: [API_Operadoras_ANS.postman_collections.json](./postman_collection.json) (adicione no repositório)
+- Arquivo: [API_Operadoras_ANS.postman_collections.json](./postman_collection.json) 
 
 ## 🚀 Como Executar (Docker)
 
@@ -95,7 +95,7 @@ pytest tests/
 
 - pytest
 
-## Padrão de projeto
+### Padrão de projeto
 
 - Repository
 - Unit Of Work
